@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function () {
+        try {
+          var origFetch = window.fetch;
+          var _fetch = typeof origFetch === 'function' ? origFetch.bind(window) : origFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function () {
+              return _fetch;
+            },
+            set: function (newVal) {
+              _fetch = newVal;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          try {
+            if (typeof Window !== 'undefined' && Window.prototype) {
+              var protoOrig = Window.prototype.fetch;
+              var _protoFetch = typeof protoOrig === 'function' ? protoOrig.bind(window) : protoOrig;
+              Object.defineProperty(Window.prototype, 'fetch', {
+                get: function () {
+                  return _protoFetch;
+                },
+                set: function (newVal) {
+                  _protoFetch = newVal;
+                },
+                configurable: true,
+                enumerable: true
+              });
+            }
+          } catch (e2) {}
+        }
+      })();
+    </script>
+    <title>Personal Manager</title>
+    <meta name="description" content="Personal accounting and financial manager for USD/BDT cross-border transactions, exchange rates, customer bank accounts, deposits, and ledger tracking." />
+    <meta property="og:title" content="Personal Manager" />
+    <meta property="og:description" content="Personal accounting and financial manager for USD/BDT cross-border transactions, exchange rates, customer bank accounts, deposits, and ledger tracking." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/logo.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
+    <link rel="apple-touch-icon" href="/logo.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased font-sans">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

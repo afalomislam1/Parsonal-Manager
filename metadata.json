@@ -1,0 +1,6 @@
+{
+  "name": "Personal Manager",
+  "description": "Personal accounting and financial manager for USD/BDT cross-border transactions, exchange rates, customer bank accounts, deposits, and ledger tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
