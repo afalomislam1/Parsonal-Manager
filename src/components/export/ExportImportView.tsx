@@ -13,6 +13,8 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Wallet,
+  Cloud,
+  Zap,
 } from 'lucide-react';
 import { useAccounting } from '../../context/AccountingContext';
 import {
@@ -30,6 +32,9 @@ export function ExportImportView() {
     savedAccounts,
     personalExpenses,
     settings,
+    setIsSyncModalOpen,
+    syncPin,
+    setActiveTab,
   } = useAccounting();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -125,6 +130,36 @@ export function ExportImportView() {
         </div>
       )}
 
+      {/* Multi-Device PIN Cloud Sync Banner */}
+      <div className="bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900 text-white p-5 rounded-3xl shadow-md border border-emerald-800/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-start sm:items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+            <Cloud className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center space-x-2">
+              <span className="font-bold text-base text-white">
+                মোবাইল ও পিসিতে ডাটা সিঙ্ক (Multi-Device PIN Sync)
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400 text-slate-950">
+                Live Cloud Sync
+              </span>
+            </div>
+            <p className="text-xs text-emerald-100/80 leading-relaxed max-w-xl">
+              মোবাইলের ১২২টি একাউন্ট ও লেনদেন অন্য কোনো পিসি বা ডিভাইসে এক ক্লিকে পাওয়ার জন্য একটি PIN কোড তৈরি করে ক্লাউডে ব্যাকআপ রাখুন।
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setIsSyncModalOpen(true)}
+          className="self-start sm:self-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center space-x-2 shadow-lg shadow-emerald-500/25 transition whitespace-nowrap active:scale-95"
+        >
+          <Zap className="w-4 h-4" />
+          <span>{syncPin ? `সিঙ্ক ম্যানেজ করুন (${syncPin})` : 'পিন দিয়ে সিঙ্ক করুন'}</span>
+        </button>
+      </div>
+
       {/* Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -166,6 +201,37 @@ export function ExportImportView() {
 
       {/* Main Action Modules */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Module: Previous Month Import */}
+        <div className="bg-gradient-to-br from-emerald-50 to-white rounded-2xl border-2 border-emerald-300 p-6 shadow-sm space-y-4 flex flex-col justify-between">
+          <div className="space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
+              <FileSpreadsheet className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mb-1">
+                নয়া ফিচার
+              </span>
+              <h3 className="text-base font-bold text-slate-900">
+                Import Previous Month's Accounts (আগের মাসের হিসাব ইমপোর্ট)
+              </h3>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              পূর্ববর্তী মাসের লেনদেনের হিসাব, একাউন্ট নম্বর, ব্যাংক এবং ডলার রেট সংবলিত CSV/Excel ফাইল এক ক্লিকে অ্যাকাউন্টে ইমপোর্ট করুন অথবা মাস শেষের অবশিষ্ট ব্যালেন্স রোলওভার করুন।
+            </p>
+            <div className="p-3 bg-white/80 rounded-xl text-[11px] text-emerald-900 font-mono border border-emerald-200/60">
+              সাপোর্ট: CSV ফাইল • দ্রুত টেক্সট কপি-পেস্ট • ওপেনিং ব্যালেন্স
+            </div>
+          </div>
+
+          <button
+            onClick={() => setActiveTab('previous-month-import')}
+            className="w-full py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center justify-center space-x-2 shadow-sm transition"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>আগের মাসের হিসাব ইমপোর্ট সেকশনে যান &rarr;</span>
+          </button>
+        </div>
+
         {/* Module 1: Backup Download */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4 flex flex-col justify-between">
           <div className="space-y-3">

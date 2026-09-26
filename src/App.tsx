@@ -12,8 +12,10 @@ import { SourcesLedgerView } from './components/sources/SourcesLedgerView';
 import { ReportsView } from './components/reports/ReportsView';
 import { ProfileView } from './components/profile/ProfileView';
 import { ExportImportView } from './components/export/ExportImportView';
+import { PreviousMonthImportView } from './components/import/PreviousMonthImportView';
 import { SettingsView } from './components/settings/SettingsView';
 import { MobileBottomNav } from './components/layout/MobileBottomNav';
+import { PinSyncModal } from './components/sync/PinSyncModal';
 
 function AppContent() {
   const { activeTab } = useAccounting();
@@ -41,6 +43,8 @@ function AppContent() {
         return <ProfileView />;
       case 'export-import':
         return <ExportImportView />;
+      case 'previous-month-import':
+        return <PreviousMonthImportView />;
       case 'settings':
         return <SettingsView />;
       default:
@@ -70,6 +74,9 @@ function AppContent() {
 
       {/* Mobile Bottom Quick-Action Bar */}
       <MobileBottomNav />
+
+      {/* Cloud PIN Synchronization Modal */}
+      <PinSyncModal />
     </div>
   );
 }

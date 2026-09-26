@@ -273,7 +273,8 @@ export function exportTransactionsCSV(
   transactions: Transaction[],
   filename: string,
   referenceFilterName?: string,
-  dateRangeStr?: string
+  dateRangeStr?: string,
+  categoryFilterName?: string
 ): void {
   const headers = [
     'Date',
@@ -288,7 +289,7 @@ export function exportTransactionsCSV(
     'Bank Charge (BDT)',
     'Commission (BDT)',
     'Profit (BDT)',
-    'Reference',
+    'Source Reference',
     'Status',
     'Note',
   ];
@@ -340,18 +341,29 @@ export function exportTransactionsCSV(
     escapeCSV(totalCommission),
     escapeCSV(totalProfit),
     escapeCSV(''),
-    escapeCSV(`${completed.length} txns`),
+    escapeCSV(`${completed.length} Completed`),
     escapeCSV(''),
   ];
 
   let csvContent = '\uFEFF'; // UTF-8 BOM for Excel Bengali/English compatibility
-  if (referenceFilterName || dateRangeStr) {
-    csvContent += `Report Title:,"${referenceFilterName ? referenceFilterName + ' Report' : 'Personal Transaction Account Report'}"\r\n`;
-    if (dateRangeStr) {
-      csvContent += `Date Range:,"${dateRangeStr}"\r\n`;
-    }
-    csvContent += `Generated At:,"${new Date().toLocaleString()}"\r\n\r\n`;
+  const reportTitle = referenceFilterName && referenceFilterName !== 'All' 
+    ? `${referenceFilterName} Source Report` 
+    : categoryFilterName && categoryFilterName !== 'All'
+    ? `${categoryFilterName} Category Report`
+    : 'Cross-Border Transactions Ledger Report';
+
+  csvContent += `Report Title:,"${reportTitle}"\r\n`;
+  if (categoryFilterName && categoryFilterName !== 'All') {
+    csvContent += `Category Filter:,"${categoryFilterName}"\r\n`;
   }
+  if (referenceFilterName && referenceFilterName !== 'All') {
+    csvContent += `Source Reference Filter:,"${referenceFilterName}"\r\n`;
+  }
+  if (dateRangeStr) {
+    csvContent += `Date Range:,"${dateRangeStr}"\r\n`;
+  }
+  csvContent += `Total Records Exported:,${transactions.length}\r\n`;
+  csvContent += `Generated At:,"${new Date().toLocaleString()}"\r\n\r\n`;
 
   csvContent += headers.join(',') + '\r\n';
   rows.forEach((r) => {

@@ -23,6 +23,15 @@ import {
   saveStoredData,
   StorageData,
 } from '../utils/storage';
+import {
+  getStoredPin,
+  setStoredPin,
+  getStoredLastSyncTime,
+  setStoredLastSyncTime,
+  saveToCloudWithPin,
+  loadFromCloudWithPin,
+  SyncResult,
+} from '../utils/syncService';
 
 export interface NewTransactionDraft {
   date: string;
@@ -97,6 +106,7 @@ export interface AccountingContextType {
     dollarRate: number;
     actualSend: number;
     referenceBy: string;
+    category?: string;
     note?: string;
     saveAccount?: boolean;
     status?: Transaction['status'];
@@ -143,6 +153,20 @@ export interface AccountingContextType {
   resetToDefaultDemo: () => void;
   clearAllData: () => void;
 
+  // PIN Cloud Synchronization (Mobile & PC)
+  syncPin: string;
+  setSyncPin: (pin: string) => void;
+  isSyncModalOpen: boolean;
+  setIsSyncModalOpen: (open: boolean) => void;
+  lastSyncTime: string | null;
+  isSyncLoading: boolean;
+  syncMessage: { text: string; type: 'success' | 'error' | 'info' } | null;
+  setSyncMessage: (msg: { text: string; type: 'success' | 'error' | 'info' } | null) => void;
+  saveDataToPin: (targetPin?: string) => Promise<SyncResult>;
+  loadDataFromPin: (targetPin?: string) => Promise<SyncResult>;
+  autoSyncEnabled: boolean;
+  setAutoSyncEnabled: (enabled: boolean) => void;
+
   importTransactionsList: (
     items: Array<{
       date: string;
@@ -167,6 +191,35 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
   const [draftTransaction, setDraftTransaction] = useState<NewTransactionDraft | null>(null);
   const [transactionSearchFilter, setTransactionSearchFilter] = useState<string>('');
   const [focusedTransactionId, setFocusedTransactionId] = useState<string | null>(null);
+
+  // PIN Cloud Sync State
+  const [syncPin, setSyncPinState] = useState<string>(() => getStoredPin());
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(() => getStoredLastSyncTime());
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState<boolean>(false);
+  const [isSyncLoading, setIsSyncLoading] = useState<boolean>(false);
+  const [syncMessage, setSyncMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [autoSyncEnabled, setAutoSyncEnabledState] = useState<boolean>(() => {
+    try {
+      const val = localStorage.getItem('crossborder_auto_sync');
+      return val === null ? true : val === 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const setSyncPin = (pin: string) => {
+    setSyncPinState(pin);
+    setStoredPin(pin);
+  };
+
+  const setAutoSyncEnabled = (enabled: boolean) => {
+    setAutoSyncEnabledState(enabled);
+    try {
+      localStorage.setItem('crossborder_auto_sync', enabled ? 'true' : 'false');
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const navigateToTransaction = (transactionId: string) => {
     setTransactionSearchFilter(transactionId);
@@ -471,6 +524,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     dollarRate: number;
     actualSend: number;
     referenceBy: string;
+    category?: string;
     note?: string;
     saveAccount?: boolean;
     status?: Transaction['status'];
@@ -495,6 +549,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
       commission,
       profit,
       referenceBy: params.referenceBy.trim() || settings.references[0] || 'Kaka',
+      category: params.category || 'Family Support',
       note: params.note?.trim() || '',
       status: params.status || 'Completed',
       createdAt: nowIso,
@@ -823,6 +878,75 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     });
   };
 
+  const saveDataToPin = async (targetPin?: string): Promise<SyncResult> => {
+    const effectivePin = (targetPin || syncPin).trim();
+    if (!effectivePin || effectivePin.length < 3) {
+      const errRes: SyncResult = {
+        success: false,
+        error: 'অনুগ্রহ করে কমপক্ষে ৩ সংখ্যার একটি পিন দিন (যেমন: 1234 বা 7860)',
+      };
+      setSyncMessage({ text: errRes.error!, type: 'error' });
+      return errRes;
+    }
+
+    setIsSyncLoading(true);
+    setSyncMessage(null);
+    try {
+      const result = await saveToCloudWithPin(effectivePin, data);
+      if (result.success) {
+        setSyncPin(effectivePin);
+        if (result.savedAt) setLastSyncTime(result.savedAt);
+        setSyncMessage({
+          text: `সফলভাবে PIN [${effectivePin}]-এ আপনার সকল হিসাব ক্লাউডে ব্যাকআপ হয়েছে!`,
+          type: 'success',
+        });
+      } else {
+        setSyncMessage({
+          text: result.error || 'ক্লাউডে সেভ করতে সমস্যা হয়েছে।',
+          type: 'error',
+        });
+      }
+      return result;
+    } finally {
+      setIsSyncLoading(false);
+    }
+  };
+
+  const loadDataFromPin = async (targetPin?: string): Promise<SyncResult> => {
+    const effectivePin = (targetPin || syncPin).trim();
+    if (!effectivePin) {
+      const errRes: SyncResult = {
+        success: false,
+        error: 'অনুগ্রহ করে আপনার পিন কোড দিন',
+      };
+      setSyncMessage({ text: errRes.error!, type: 'error' });
+      return errRes;
+    }
+
+    setIsSyncLoading(true);
+    setSyncMessage(null);
+    try {
+      const result = await loadFromCloudWithPin(effectivePin);
+      if (result.success && result.data) {
+        setSyncPin(effectivePin);
+        restoreFullBackup(result.data);
+        if (result.savedAt) setLastSyncTime(result.savedAt);
+        setSyncMessage({
+          text: `সফলভাবে হিসাব লোড হয়েছে! (${result.data.transactions?.length || 0}টি লেনদেন, ${result.data.savedAccounts?.length || 0}টি একাউন্ট)`,
+          type: 'success',
+        });
+      } else {
+        setSyncMessage({
+          text: result.error || 'ক্লাউড থেকে ডেটা পাওয়া যায়নি।',
+          type: 'error',
+        });
+      }
+      return result;
+    } finally {
+      setIsSyncLoading(false);
+    }
+  };
+
   // CSV Import Processor
   const importTransactionsList = (
     items: Array<{
@@ -975,6 +1099,21 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     restoreFullBackup,
     resetToDefaultDemo,
     clearAllData,
+
+    // PIN Cloud Sync
+    syncPin,
+    setSyncPin,
+    isSyncModalOpen,
+    setIsSyncModalOpen,
+    lastSyncTime,
+    isSyncLoading,
+    syncMessage,
+    setSyncMessage,
+    saveDataToPin,
+    loadDataFromPin,
+    autoSyncEnabled,
+    setAutoSyncEnabled,
+
     importTransactionsList,
   };
 

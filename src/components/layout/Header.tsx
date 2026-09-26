@@ -7,10 +7,10 @@ import {
   Menu,
   ShieldCheck,
   TrendingUp,
+  Cloud,
 } from 'lucide-react';
 import { useAccounting } from '../../context/AccountingContext';
 import { formatBDT, formatUSD } from '../../utils/calculations';
-import { GlobalSearchBar } from './GlobalSearchBar';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -22,6 +22,8 @@ export function Header({ onToggleSidebar }: HeaderProps) {
     remainingUsdBalance,
     totalProfit,
     setActiveTab,
+    setIsSyncModalOpen,
+    syncPin,
   } = useAccounting();
 
   return (
@@ -61,13 +63,8 @@ export function Header({ onToggleSidebar }: HeaderProps) {
             </div>
           </div>
 
-          {/* Center: Global Search Bar */}
-          <div className="flex-1 max-w-xs sm:max-w-sm md:max-w-md mx-2 sm:mx-4">
-            <GlobalSearchBar />
-          </div>
-
           {/* Right: Balance Pill & Quick Action Buttons */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {/* Live USD Balance pill */}
             <div
               className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border text-xs sm:text-sm font-semibold transition ${
@@ -95,6 +92,17 @@ export function Header({ onToggleSidebar }: HeaderProps) {
                 {formatBDT(totalProfit)}
               </span>
             </div>
+
+            {/* PIN Cloud Sync Button */}
+            <button
+              id="btn-header-pin-sync"
+              onClick={() => setIsSyncModalOpen(true)}
+              className="inline-flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-950 hover:bg-emerald-100 hover:border-emerald-400 shadow-2xs transition"
+              title="মোবাইল ও পিসিতে ডাটা সিঙ্ক (PIN Sync)"
+            >
+              <Cloud className="w-3.5 h-3.5 sm:mr-1.5 text-emerald-700" />
+              <span className="hidden xs:inline">{syncPin ? `PIN: ${syncPin}` : 'PIN Sync'}</span>
+            </button>
 
             {/* Action buttons (Visible on sm+ screens; mobile uses bottom navigation) */}
             <div className="hidden sm:flex items-center space-x-1.5 sm:space-x-2">

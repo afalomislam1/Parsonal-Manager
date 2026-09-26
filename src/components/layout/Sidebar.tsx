@@ -14,6 +14,8 @@ import {
   CreditCard,
   Percent,
   Wallet,
+  Cloud,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useAccounting } from '../../context/AccountingContext';
 import { ActiveTab } from '../../types';
@@ -32,6 +34,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     deposits,
     personalExpenses,
     settings,
+    setIsSyncModalOpen,
+    syncPin,
   } = useAccounting();
 
   const navItems: Array<{
@@ -100,7 +104,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       id: 'export-import',
       label: 'Export & Import',
       icon: Download,
-      description: 'Backup, CSV & Excel import',
+      description: 'Backup, CSV & Excel export',
+    },
+    {
+      id: 'previous-month-import',
+      label: 'Import Prev Month',
+      icon: FileSpreadsheet,
+      description: 'আগের মাসের হিসাব ইমপোর্ট',
     },
     {
       id: 'settings',
@@ -219,6 +229,25 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             );
           })}
         </nav>
+
+        {/* Multi-Device PIN Cloud Sync Quick Access */}
+        <div className="p-3 border-t border-slate-800 bg-emerald-950/30">
+          <button
+            onClick={() => {
+              setIsSyncModalOpen(true);
+              onClose();
+            }}
+            className="w-full py-2 px-3 rounded-xl bg-emerald-700/80 hover:bg-emerald-600 text-white text-xs font-bold flex items-center justify-between transition shadow-sm"
+          >
+            <div className="flex items-center space-x-2">
+              <Cloud className="w-4 h-4 text-emerald-300" />
+              <span>Multi-Device PIN Sync</span>
+            </div>
+            <span className="text-[10px] bg-emerald-900 px-1.5 py-0.5 rounded text-emerald-200 font-mono">
+              {syncPin ? syncPin : 'Sync'}
+            </span>
+          </button>
+        </div>
 
         {/* References Footer Summary */}
         <div className="p-3 border-t border-slate-800 bg-slate-950/40 text-[11px] text-slate-400">

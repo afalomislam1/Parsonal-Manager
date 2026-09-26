@@ -15,6 +15,10 @@ import {
   BarChart3,
   PieChart,
   Wallet,
+  Cloud,
+  Zap,
+  FileSpreadsheet,
+  ArrowRight,
 } from 'lucide-react';
 import { useAccounting } from '../../context/AccountingContext';
 import {
@@ -23,6 +27,8 @@ import {
   formatUSD,
   roundTo,
 } from '../../utils/calculations';
+import { TransactionVolumeTrendChart } from './TransactionVolumeTrendChart';
+import { ProfitExpensesTrendChart } from './ProfitExpensesTrendChart';
 
 export function DashboardView() {
   const {
@@ -43,6 +49,8 @@ export function DashboardView() {
     setActiveTab,
     setDraftTransaction,
     settings,
+    setIsSyncModalOpen,
+    syncPin,
   } = useAccounting();
 
   // Completed transactions
@@ -116,7 +124,17 @@ export function DashboardView() {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            id="dashboard-pin-sync-btn"
+            onClick={() => setIsSyncModalOpen(true)}
+            className="px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center space-x-1.5 shadow-sm transition"
+            title="মোবাইল ও পিসিতে ডাটা সিঙ্ক করুন"
+          >
+            <Cloud className="w-3.5 h-3.5 text-emerald-700" />
+            <span>{syncPin ? `PIN: ${syncPin}` : 'PIN Sync (ডাটা সিঙ্ক)'}</span>
+          </button>
+
           <button
             id="dashboard-personal-expense-btn"
             onClick={() => setActiveTab('personal-expense')}
@@ -135,6 +153,16 @@ export function DashboardView() {
           </button>
 
           <button
+            id="dashboard-import-prev-month-btn"
+            onClick={() => setActiveTab('previous-month-import')}
+            className="px-3 py-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex items-center space-x-1.5 shadow-2xs transition"
+            title="Import previous month accounts and transactions"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-700" />
+            <span>আগের মাসের হিসাব</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('new-transaction')}
             className="px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow-sm shadow-emerald-700/20 transition"
           >
@@ -142,6 +170,66 @@ export function DashboardView() {
             <span>New Send Payout</span>
           </button>
         </div>
+      </div>
+
+      {/* Multi-Device PIN Sync Guide Banner */}
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-emerald-800/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-start sm:items-center space-x-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+            <Cloud className="w-5 h-5" />
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-center space-x-2">
+              <span className="font-bold text-sm text-white">
+                মোবাইল ও পিসিতে ১২২টি একাউন্ট সিঙ্ক (Cross-Device PIN Sync)
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400 text-emerald-950">
+                নিরাপদ
+              </span>
+            </div>
+            <p className="text-xs text-emerald-100/80 leading-relaxed">
+              মোবাইলের কোনো হিসাব নষ্ট হবে না। একটি সহজ PIN দিয়ে যে কোনো পিসি বা অন্য ডিভাইসে তাৎক্ষণিক সব হিসাব ওপেন করুন।
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setIsSyncModalOpen(true)}
+          className="self-start sm:self-auto px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition whitespace-nowrap active:scale-95"
+        >
+          <Zap className="w-3.5 h-3.5" />
+          <span>{syncPin ? `সিঙ্ক স্ট্যাটাস (${syncPin})` : 'পিন সেট ও সিঙ্ক করুন'}</span>
+        </button>
+      </div>
+
+      {/* Previous Month Import Strip */}
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200">
+            <FileSpreadsheet className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="font-bold text-xs sm:text-sm text-slate-900">
+                আগের মাসের হিসাব ইমপোর্ট ও ব্যালেন্স ক্যারি-ওভার (Import Previous Month)
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">
+                CSV / Excel / Rollover
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 mt-0.5">
+              গত মাসের লেনদেনের শিট বা মাস শেষের অবশিষ্ট ডলার ফান্ড এক ক্লিকে অ্যাকাউন্টে যুক্ত করুন।
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setActiveTab('previous-month-import')}
+          className="self-start sm:self-auto px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center space-x-1.5 shadow-2xs transition active:scale-95 whitespace-nowrap"
+        >
+          <span>হিসাব ইমপোর্ট করুন</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
       </div>
 
       {/* TOP KPI CARDS (Requirement 16) */}
@@ -320,6 +408,12 @@ export function DashboardView() {
           </div>
         </div>
       </div>
+
+      {/* 30-Day Cross-Border Transaction Volume Line Chart (Recharts) */}
+      <TransactionVolumeTrendChart />
+
+      {/* 6-Month Profit vs Personal Expenses Trend Chart */}
+      <ProfitExpensesTrendChart />
 
       {/* REFERENCE PERFORMANCE (Requirement 16 & 7) */}
       <div className="space-y-3">

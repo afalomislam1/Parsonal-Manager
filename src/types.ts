@@ -14,6 +14,7 @@ export interface Transaction {
   commission: number; // sendUsd * commissionRate
   profit: number; // bankCharge + commission
   referenceBy: string; // "Kaka" | "Humaiun Kaka's Assistant" | custom
+  category?: string; // "Family Support" | "Commercial" | "Medical" | "Education" | "Emergency" | "Other"
   note?: string;
   status: TransactionStatus;
   createdAt: string;
@@ -99,4 +100,5 @@ export type ActiveTab =
   | 'reports' 
   | 'profile' 
   | 'export-import' 
+  | 'previous-month-import'
   | 'settings';
