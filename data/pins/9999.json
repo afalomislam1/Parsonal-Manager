@@ -1,7 +1,7 @@
 {
   "pin": "9999",
-  "lastSaved": "2026-09-26T18:34:40.452Z",
-  "deviceName": "TestPhone",
+  "lastSaved": "2026-09-27T09:05:52.583Z",
+  "deviceName": "Mobile",
   "clientIp": "127.0.0.1",
   "stats": {
     "transactionsCount": 1,
@@ -12,9 +12,22 @@
   "data": {
     "transactions": [
       {
-        "id": "TRX-001"
+        "id": "TX-1",
+        "date": "2026-09-27",
+        "recipientName": "Karim",
+        "accountNumber": "01700000000",
+        "bankName": "bKash",
+        "sendAmountUSD": 100,
+        "dollarRate": 124,
+        "expectedBDT": 12400,
+        "actualSend": 12400,
+        "referenceBy": "Main",
+        "status": "Completed"
       }
     ],
-    "savedAccounts": []
+    "deposits": [],
+    "savedAccounts": [],
+    "personalExpenses": [],
+    "settings": {}
   }
 }

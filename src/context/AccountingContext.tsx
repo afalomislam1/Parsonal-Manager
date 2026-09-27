@@ -30,6 +30,8 @@ import {
   setStoredLastSyncTime,
   saveToCloudWithPin,
   loadFromCloudWithPin,
+  normalizePin,
+  sanitizeStoragePayload,
   SyncResult,
 } from '../utils/syncService';
 
@@ -232,8 +234,49 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     saveStoredData(data);
   }, [data]);
 
-  const { transactions, deposits, savedAccounts, settings } = data;
+  // Auto-detect ?sync_pin=XXXX or ?pin=XXXX on page load (for seamless PC cross-device opening)
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.location.search) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPin = urlParams.get('sync_pin') || urlParams.get('pin');
+        if (urlPin) {
+          const clean = normalizePin(urlPin);
+          if (clean && clean.length >= 3) {
+            setSyncPin(clean);
+            setIsSyncModalOpen(true);
+            loadDataFromPin(clean);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Auto PIN sync failed:', e);
+    }
+  }, []);
+
+  const transactions = data.transactions || [];
+  const deposits = data.deposits || [];
+  const savedAccounts = data.savedAccounts || [];
   const personalExpenses = data.personalExpenses || [];
+
+  const settings: AppSettings = useMemo(() => {
+    const raw = data.settings || {};
+    return {
+      references:
+        Array.isArray(raw.references) && raw.references.length > 0
+          ? raw.references
+          : ['Kaka', "Humaiun Kaka's Assistant"],
+      banks:
+        Array.isArray(raw.banks) && raw.banks.length > 0
+          ? raw.banks
+          : ['Dutch-Bangla Bank', 'Islami Bank Bangladesh', 'BRAC Bank', 'City Bank', 'bKash', 'Nagad'],
+      commissionPerUsd: typeof raw.commissionPerUsd === 'number' ? raw.commissionPerUsd : 0.50,
+      defaultDollarRate: typeof raw.defaultDollarRate === 'number' ? raw.defaultDollarRate : 123.00,
+      currencyBdtSymbol: raw.currencyBdtSymbol || '৳',
+      currencyUsdSymbol: raw.currencyUsdSymbol || '$',
+      lastBackupDate: raw.lastBackupDate || new Date().toISOString(),
+    };
+  }, [data.settings]);
 
   // Helper to generate next IDs
   const getNextTransactionId = (): string => {
@@ -846,40 +889,36 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
   };
 
   const restoreFullBackup = (importedData: StorageData): boolean => {
-    if (!importedData || !Array.isArray(importedData.transactions) || !Array.isArray(importedData.deposits)) {
+    if (!importedData) {
       return false;
     }
-    setData({
-      version: 1,
-      transactions: importedData.transactions,
-      deposits: importedData.deposits,
-      savedAccounts: importedData.savedAccounts || [],
-      personalExpenses: importedData.personalExpenses || [],
-      settings: importedData.settings || settings,
-      lastBackupDate: new Date().toISOString(),
-    });
+    const safeData = sanitizeStoragePayload(importedData);
+    setData(safeData);
+    saveStoredData(safeData);
     return true;
   };
 
   const resetToDefaultDemo = () => {
     const defaultData = getDefaultInitialData();
     setData(defaultData);
+    saveStoredData(defaultData);
   };
 
   const clearAllData = () => {
+    const defaultData = getDefaultInitialData();
     setData({
       version: 1,
       transactions: [],
       deposits: [],
-      savedAccounts: [],
+      savedAccounts: defaultData.savedAccounts,
       personalExpenses: [],
-      settings,
+      settings: defaultData.settings,
       lastBackupDate: new Date().toISOString(),
     });
   };
 
   const saveDataToPin = async (targetPin?: string): Promise<SyncResult> => {
-    const effectivePin = (targetPin || syncPin).trim();
+    const effectivePin = normalizePin(targetPin || syncPin);
     if (!effectivePin || effectivePin.length < 3) {
       const errRes: SyncResult = {
         success: false,
@@ -892,12 +931,13 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
     setIsSyncLoading(true);
     setSyncMessage(null);
     try {
-      const result = await saveToCloudWithPin(effectivePin, data);
+      const safeData = sanitizeStoragePayload(data);
+      const result = await saveToCloudWithPin(effectivePin, safeData);
       if (result.success) {
         setSyncPin(effectivePin);
         if (result.savedAt) setLastSyncTime(result.savedAt);
         setSyncMessage({
-          text: `সফলভাবে PIN [${effectivePin}]-এ আপনার সকল হিসাব ক্লাউডে ব্যাকআপ হয়েছে!`,
+          text: `✅ সফলভাবে PIN [${effectivePin}]-এ আপনার সকল হিসাব ক্লাউডে ব্যাকআপ হয়েছে! এখন যে কোনো পিসিতে এই পিন দিয়ে হিসাব ওপেন করতে পারবেন।`,
           type: 'success',
         });
       } else {
@@ -913,11 +953,11 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
   };
 
   const loadDataFromPin = async (targetPin?: string): Promise<SyncResult> => {
-    const effectivePin = (targetPin || syncPin).trim();
-    if (!effectivePin) {
+    const effectivePin = normalizePin(targetPin || syncPin);
+    if (!effectivePin || effectivePin.length < 3) {
       const errRes: SyncResult = {
         success: false,
-        error: 'অনুগ্রহ করে আপনার পিন কোড দিন',
+        error: 'অনুগ্রহ করে কমপক্ষে ৩ সংখ্যার সঠিক পিন দিন (যেমন: 1234 বা 7860)',
       };
       setSyncMessage({ text: errRes.error!, type: 'error' });
       return errRes;
@@ -932,7 +972,7 @@ export function AccountingProvider({ children }: { children: React.ReactNode }) 
         restoreFullBackup(result.data);
         if (result.savedAt) setLastSyncTime(result.savedAt);
         setSyncMessage({
-          text: `সফলভাবে হিসাব লোড হয়েছে! (${result.data.transactions?.length || 0}টি লেনদেন, ${result.data.savedAccounts?.length || 0}টি একাউন্ট)`,
+          text: `🎉 সফলভাবে পিসিতে হিসাব লোড হয়েছে! (${result.data.transactions?.length || 0}টি লেনদেন ও ${result.data.savedAccounts?.length || 0}টি একাউন্ট পাওয়া গেছে)`,
           type: 'success',
         });
       } else {

@@ -254,17 +254,52 @@ export async function importJSONBackup(file: File): Promise<StorageData> {
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
-        const parsed = JSON.parse(text) as StorageData;
-        if (!parsed || !Array.isArray(parsed.transactions) || !Array.isArray(parsed.deposits)) {
-          throw new Error('Invalid backup file structure: missing transactions or deposits.');
+        if (!text || text.trim().length === 0) {
+          throw new Error('ফাইলটি সম্পূর্ণ খালি। অনুগ্রহ করে সঠিক ব্যাকআপ ফাইল নির্বাচন করুন।');
         }
-        saveStoredData(parsed);
-        resolve(parsed);
+        let parsed: any;
+        try {
+          parsed = JSON.parse(text);
+        } catch {
+          throw new Error('ফাইলটি সঠিক JSON ফরম্যাটে নেই। অনুগ্রহ করে সঠিক .json ব্যাকআপ ফাইল আপলোড করুন।');
+        }
+
+        if (!parsed || typeof parsed !== 'object') {
+          throw new Error('অকার্যকর ব্যাকআপ ফাইল ফরম্যাট।');
+        }
+
+        const defaults = getDefaultInitialData();
+        const safeData: StorageData = {
+          version: 1,
+          transactions: Array.isArray(parsed.transactions) ? parsed.transactions : [],
+          deposits: Array.isArray(parsed.deposits) ? parsed.deposits : [],
+          savedAccounts:
+            Array.isArray(parsed.savedAccounts) && parsed.savedAccounts.length > 0
+              ? parsed.savedAccounts
+              : defaults.savedAccounts,
+          personalExpenses: Array.isArray(parsed.personalExpenses) ? parsed.personalExpenses : [],
+          settings: {
+            ...defaults.settings,
+            ...(parsed.settings || {}),
+            references:
+              Array.isArray(parsed.settings?.references) && parsed.settings.references.length > 0
+                ? parsed.settings.references
+                : defaults.settings.references,
+            banks:
+              Array.isArray(parsed.settings?.banks) && parsed.settings.banks.length > 0
+                ? parsed.settings.banks
+                : defaults.settings.banks,
+          },
+          lastBackupDate: new Date().toISOString(),
+        };
+
+        saveStoredData(safeData);
+        resolve(safeData);
       } catch (err: any) {
-        reject(new Error(err.message || 'Failed to parse backup JSON file.'));
+        reject(new Error(err.message || 'ব্যাকআপ ফাইলটি লোড করতে সমস্যা হয়েছে।'));
       }
     };
-    reader.onerror = () => reject(new Error('Failed to read file.'));
+    reader.onerror = () => reject(new Error('ফাইল পড়তে ব্যর্থ হয়েছে।'));
     reader.readAsText(file);
   });
 }
