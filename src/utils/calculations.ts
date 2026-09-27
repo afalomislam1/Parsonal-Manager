@@ -39,6 +39,40 @@ export function computeDepositBDT(usdAmount: number, receivingRate: number): num
   return roundTo(usdAmount * receivingRate, 2);
 }
 
+export function computeDepositUSD(bdtAmount: number, receivingRate: number): number {
+  if (isNaN(bdtAmount) || isNaN(receivingRate) || bdtAmount <= 0 || receivingRate <= 0) return 0;
+  return roundTo(bdtAmount / receivingRate, 2);
+}
+
+/**
+ * Normalizes user input on number/amount fields:
+ * - Converts Bengali numerals (০-৯ -> 0-9)
+ * - Retains only digits and at most one decimal point
+ */
+export function cleanNumericInput(val: string): string {
+  if (!val) return '';
+  const banglaToEnglishMap: Record<string, string> = {
+    '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+    '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9',
+  };
+  let str = String(val);
+  for (const [bn, en] of Object.entries(banglaToEnglishMap)) {
+    str = str.split(bn).join(en);
+  }
+  // Allow only digits and decimal point
+  let cleaned = '';
+  let hasDecimal = false;
+  for (const char of str) {
+    if (char >= '0' && char <= '9') {
+      cleaned += char;
+    } else if (char === '.' && !hasDecimal) {
+      cleaned += '.';
+      hasDecimal = true;
+    }
+  }
+  return cleaned;
+}
+
 export function formatBDT(amount: number, showDecimalIfZero = false): string {
   if (amount === undefined || amount === null || isNaN(amount)) return '৳0';
   const hasDecimals = amount % 1 !== 0;

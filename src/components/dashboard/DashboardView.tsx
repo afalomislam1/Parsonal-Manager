@@ -172,22 +172,22 @@ export function DashboardView() {
         </div>
       </div>
 
-      {/* Multi-Device PIN Sync Guide Banner */}
-      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-900 text-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-emerald-800/40 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      {/* Multi-Device PIN Sync Guide Banner (Clean Professional White & Emerald) */}
+      <div className="bg-white text-slate-900 p-3.5 sm:p-4 rounded-2xl shadow-2xs border border-emerald-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-start sm:items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-200">
             <Cloud className="w-5 h-5" />
           </div>
           <div className="space-y-0.5">
             <div className="flex items-center space-x-2">
-              <span className="font-bold text-sm text-white">
+              <span className="font-bold text-sm text-slate-900">
                 মোবাইল ও পিসিতে ১২২টি একাউন্ট সিঙ্ক (Cross-Device PIN Sync)
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-400 text-emerald-950">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                 নিরাপদ
               </span>
             </div>
-            <p className="text-xs text-emerald-100/80 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed">
               মোবাইলের কোনো হিসাব নষ্ট হবে না। একটি সহজ PIN দিয়ে যে কোনো পিসি বা অন্য ডিভাইসে তাৎক্ষণিক সব হিসাব ওপেন করুন।
             </p>
           </div>
@@ -195,7 +195,7 @@ export function DashboardView() {
 
         <button
           onClick={() => setIsSyncModalOpen(true)}
-          className="self-start sm:self-auto px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition whitespace-nowrap active:scale-95"
+          className="self-start sm:self-auto px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center space-x-1.5 shadow-2xs transition whitespace-nowrap active:scale-95"
         >
           <Zap className="w-3.5 h-3.5" />
           <span>{syncPin ? `সিঙ্ক স্ট্যাটাস (${syncPin})` : 'পিন সেট ও সিঙ্ক করুন'}</span>
@@ -225,7 +225,7 @@ export function DashboardView() {
 
         <button
           onClick={() => setActiveTab('previous-month-import')}
-          className="self-start sm:self-auto px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center space-x-1.5 shadow-2xs transition active:scale-95 whitespace-nowrap"
+          className="self-start sm:self-auto px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center space-x-1.5 shadow-2xs transition active:scale-95 whitespace-nowrap"
         >
           <span>হিসাব ইমপোর্ট করুন</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -313,28 +313,28 @@ export function DashboardView() {
           </span>
         </div>
 
-        {/* Total USD Balance (Hero) */}
-        <div className="col-span-2 sm:col-span-1 p-3.5 rounded-xl bg-slate-900 text-white shadow-sm flex flex-col justify-between border border-slate-800">
-          <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+        {/* Total USD Balance (Hero - Clean Professional White) */}
+        <div className="col-span-2 sm:col-span-1 p-3.5 rounded-xl bg-white text-slate-900 shadow-2xs flex flex-col justify-between border-2 border-emerald-500/50">
+          <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">
             USD Balance
           </span>
-          <span className="text-xl font-mono font-bold text-emerald-300 mt-1">
+          <span className="text-xl font-mono font-bold text-emerald-700 mt-1">
             {formatUSD(remainingUsdBalance)}
           </span>
-          <span className="text-[10px] text-slate-400">
+          <span className="text-[10px] text-slate-500">
             Rec: {formatUSD(totalDepositedUsd)}
           </span>
         </div>
 
-        {/* Total Profit (Hero) */}
-        <div className="col-span-2 sm:col-span-1 p-3.5 rounded-xl bg-gradient-to-br from-emerald-800 to-emerald-950 text-white shadow-md flex flex-col justify-between">
-          <span className="text-[10px] uppercase font-bold text-emerald-300 tracking-wider">
+        {/* Total Profit (Hero - Clean Emerald Light) */}
+        <div className="col-span-2 sm:col-span-1 p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-300 text-emerald-950 shadow-2xs flex flex-col justify-between">
+          <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider">
             Total Profit
           </span>
-          <span className="text-xl font-mono font-bold text-white mt-1">
+          <span className="text-xl font-mono font-bold text-emerald-800 mt-1">
             {formatBDT(totalProfit)}
           </span>
-          <span className="text-[10px] text-emerald-200">
+          <span className="text-[10px] text-emerald-700">
             Charge + Comm.
           </span>
         </div>

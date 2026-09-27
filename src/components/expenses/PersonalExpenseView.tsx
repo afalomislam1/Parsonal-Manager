@@ -309,20 +309,20 @@ export function PersonalExpenseView() {
           </span>
         </div>
 
-        {/* Net Available USD Balance in Kaka's Fund */}
-        <div className="p-4 rounded-xl bg-slate-900 text-white shadow-sm flex flex-col justify-between border border-slate-800">
+        {/* Net Available USD Balance in Kaka's Fund (Clean Professional White) */}
+        <div className="p-4 rounded-xl bg-white text-slate-900 shadow-2xs flex flex-col justify-between border-2 border-emerald-500/50">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase font-bold text-emerald-400 tracking-wider">
+            <span className="text-[11px] uppercase font-bold text-emerald-800 tracking-wider">
               ফান্ডের প্রকৃত ব্যালেন্স (Net USD)
             </span>
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-700" />
           </div>
           <div className="mt-2">
-            <span className="text-2xl font-mono font-bold text-emerald-300">
+            <span className="text-2xl font-mono font-bold text-emerald-700">
               {formatUSD(netAvailableUsdBalance)}
             </span>
           </div>
-          <span className="text-[11px] text-slate-400 font-medium mt-1">
+          <span className="text-[11px] text-slate-500 font-medium mt-1">
             জমা - কাস্টমার পেমেন্ট - নিজস্ব খরচ
           </span>
         </div>

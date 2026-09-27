@@ -306,7 +306,7 @@ export function TransactionListView() {
           <button
             id="btn-add-new-tx"
             onClick={() => setActiveTab('new-transaction')}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow-sm transition active:scale-95"
+            className="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow-2xs transition active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Send Payout</span>
@@ -391,7 +391,7 @@ export function TransactionListView() {
             }}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
               referenceFilter === 'All' && statusFilter === 'All'
-                ? 'bg-slate-900 text-white shadow-sm'
+                ? 'bg-emerald-700 text-white shadow-2xs'
                 : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80'
             }`}
           >

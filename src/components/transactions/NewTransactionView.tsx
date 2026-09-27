@@ -21,6 +21,7 @@ import {
   computeCommission,
   computeExpectedBDT,
   computeProfit,
+  cleanNumericInput,
   formatBDT,
   formatUSD,
   getTodayDateString,
@@ -242,7 +243,7 @@ export function NewTransactionView() {
             type="button"
             id="btn-view-all-tx"
             onClick={() => setActiveTab('transactions')}
-            className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition"
+            className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold shadow-2xs transition"
           >
             All Transactions
           </button>
@@ -420,10 +421,13 @@ export function NewTransactionView() {
                 </label>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="off"
                   id="input-tx-account"
                   placeholder="e.g. 123456789 or 017..."
                   value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value)}
+                  onChange={(e) => setAccountNumber(cleanNumericInput(e.target.value))}
                   required
                   className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-xs font-mono font-semibold focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition"
                 />
@@ -465,7 +469,7 @@ export function NewTransactionView() {
               </div>
             </div>
 
-            {/* Row 4: Core Financials (USD, Rate, Expected BDT, Actual Send BDT) */}
+            {/* Row 4: Core Financials (USD, Rate, Expected BDT, Actual Send BDT) with Decimal Keypad */}
             <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/80 space-y-2.5">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div>
@@ -475,13 +479,14 @@ export function NewTransactionView() {
                   <div className="relative">
                     <span className="absolute left-2.5 top-1.5 text-slate-400 font-bold text-xs">$</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*[.]?[0-9]*"
+                      autoComplete="off"
                       id="input-tx-usd"
-                      step="any"
-                      min="0"
                       placeholder="300"
                       value={sendUsd}
-                      onChange={(e) => setSendUsd(e.target.value)}
+                      onChange={(e) => setSendUsd(cleanNumericInput(e.target.value))}
                       required
                       className="w-full pl-6 pr-2 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-sm font-bold font-mono focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white"
                     />
@@ -495,13 +500,14 @@ export function NewTransactionView() {
                   <div className="relative">
                     <span className="absolute left-2.5 top-1.5 text-slate-400 font-bold text-xs">৳</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*[.]?[0-9]*"
+                      autoComplete="off"
                       id="input-tx-rate"
-                      step="any"
-                      min="0"
                       placeholder="123"
                       value={dollarRate}
-                      onChange={(e) => setDollarRate(e.target.value)}
+                      onChange={(e) => setDollarRate(cleanNumericInput(e.target.value))}
                       required
                       className="w-full pl-6 pr-2 py-1.5 rounded-lg border border-slate-300 text-slate-900 text-sm font-bold font-mono focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 bg-white"
                     />
@@ -524,14 +530,15 @@ export function NewTransactionView() {
                   <div className="relative">
                     <span className="absolute left-2.5 top-1.5 text-slate-400 font-bold text-xs">৳</span>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
+                      pattern="[0-9]*[.]?[0-9]*"
+                      autoComplete="off"
                       id="input-tx-actual-send"
-                      step="any"
-                      min="0"
                       placeholder="e.g. 36850"
                       value={actualSend}
                       onChange={(e) => {
-                        setActualSend(e.target.value);
+                        setActualSend(cleanNumericInput(e.target.value));
                         setActualSendTouched(true);
                       }}
                       required
@@ -597,76 +604,76 @@ export function NewTransactionView() {
           </form>
         </div>
 
-        {/* Right Side: Sticky Live Calculation Card (5 cols) */}
+        {/* Right Side: Sticky Live Calculation Card (5 cols) (Professional Clean White) */}
         <div className="lg:col-span-5 sticky top-20 space-y-3">
-          <div className="bg-slate-900 text-slate-100 rounded-2xl p-4 sm:p-5 shadow-lg border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between pb-2.5 border-b border-slate-800">
+          <div className="bg-white text-slate-900 rounded-2xl p-4 sm:p-5 shadow-xs border border-slate-200/90 space-y-3">
+            <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
               <div className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
-                <span className="font-bold text-xs text-white uppercase tracking-wider">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <span className="font-bold text-xs text-slate-900 uppercase tracking-wider">
                   Live Financial Calculation
                 </span>
               </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-emerald-400 font-bold">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">
                 Auto
               </span>
             </div>
 
             {/* Compact Breakdown */}
             <div className="space-y-2 font-mono text-xs">
-              <div className="flex items-center justify-between text-slate-300">
-                <span className="font-sans text-slate-400">Send USD:</span>
-                <span className="font-bold text-white">{formatUSD(numSendUsd)}</span>
+              <div className="flex items-center justify-between text-slate-600">
+                <span className="font-sans text-slate-500">Send USD:</span>
+                <span className="font-bold text-slate-900">{formatUSD(numSendUsd)}</span>
               </div>
 
-              <div className="flex items-center justify-between text-slate-300">
-                <span className="font-sans text-slate-400">Dollar Rate:</span>
-                <span>{numDollarRate ? `৳${numDollarRate}` : '৳0'}</span>
+              <div className="flex items-center justify-between text-slate-600">
+                <span className="font-sans text-slate-500">Dollar Rate:</span>
+                <span className="font-bold text-slate-900">{numDollarRate ? `৳${numDollarRate}` : '৳0'}</span>
               </div>
 
-              <div className="flex items-center justify-between pt-1.5 border-t border-slate-800 text-slate-200">
-                <span className="font-sans text-slate-400">Expected BDT:</span>
-                <span className="font-bold text-slate-100">{formatBDT(expectedBdt)}</span>
+              <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-slate-700">
+                <span className="font-sans text-slate-500">Expected BDT:</span>
+                <span className="font-bold text-slate-900">{formatBDT(expectedBdt)}</span>
               </div>
 
-              <div className="flex items-center justify-between text-slate-200">
-                <span className="font-sans text-slate-400">Actual Send (BDT):</span>
-                <span className="font-bold text-slate-100">{formatBDT(numActualSend)}</span>
+              <div className="flex items-center justify-between text-slate-700">
+                <span className="font-sans text-slate-500">Actual Send (BDT):</span>
+                <span className="font-bold text-slate-900">{formatBDT(numActualSend)}</span>
               </div>
 
               {/* Bank Charge & Commission Box */}
-              <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="font-sans text-[11px] text-slate-300">Bank Charge (Expected - Actual):</span>
+                  <span className="font-sans text-[11px] text-slate-600">Bank Charge (Expected - Actual):</span>
                   <span
                     className={`font-bold ${
-                      bankCharge >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                      bankCharge >= 0 ? 'text-emerald-700' : 'text-rose-600'
                     }`}
                   >
                     {formatBDT(bankCharge)}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between pt-1 border-t border-slate-700/50">
-                  <span className="font-sans text-[11px] text-slate-300">
+                <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                  <span className="font-sans text-[11px] text-slate-600">
                     Commission (${numSendUsd} × ৳{settings.commissionPerUsd.toFixed(2)}):
                   </span>
-                  <span className="font-bold text-emerald-400">{formatBDT(commission)}</span>
+                  <span className="font-bold text-emerald-700">{formatBDT(commission)}</span>
                 </div>
               </div>
 
               {/* Total Profit Hero Box */}
-              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-950/90 to-slate-900 border border-emerald-500/50 text-white flex items-center justify-between">
+              <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-300 text-emerald-950 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-sans uppercase tracking-wider font-bold text-emerald-300 block">
+                  <span className="text-[10px] font-sans uppercase tracking-wider font-bold text-emerald-800 block">
                     Net Profit (মোট লাভ)
                   </span>
-                  <span className="text-[10px] font-sans text-slate-400">
+                  <span className="text-[10px] font-sans text-emerald-700">
                     Charge + Commission
                   </span>
                 </div>
                 <div className="text-right">
-                  <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-300 block leading-tight">
+                  <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-800 block leading-tight">
                     {formatBDT(totalProfit)}
                   </span>
                 </div>
@@ -674,12 +681,12 @@ export function NewTransactionView() {
             </div>
 
             {/* Quick Source Balance indicator */}
-            <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
               <span className="flex items-center space-x-1">
-                <Wallet className="w-3.5 h-3.5 text-emerald-400" />
+                <Wallet className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Available USD Balance:</span>
               </span>
-              <span className="font-mono font-bold text-white">
+              <span className="font-mono font-bold text-slate-900">
                 {formatUSD(remainingUsdBalance)}
               </span>
             </div>

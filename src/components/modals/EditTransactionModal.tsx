@@ -7,6 +7,7 @@ import {
   computeCommission,
   computeExpectedBDT,
   computeProfit,
+  cleanNumericInput,
   formatBDT,
   formatUSD,
 } from '../../utils/calculations';
@@ -155,8 +156,11 @@ export function EditTransactionModal({ transaction, onClose }: EditTransactionMo
               <label className="block text-xs font-bold text-slate-700 mb-1">Account Number</label>
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="off"
                 value={accountNumber}
-                onChange={(e) => setAccountNumber(e.target.value)}
+                onChange={(e) => setAccountNumber(cleanNumericInput(e.target.value))}
                 required
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono text-slate-900"
               />
@@ -182,10 +186,12 @@ export function EditTransactionModal({ transaction, onClose }: EditTransactionMo
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Send USD ($)</label>
               <input
-                type="number"
-                step="any"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*[.]?[0-9]*"
+                autoComplete="off"
                 value={sendUsd}
-                onChange={(e) => setSendUsd(e.target.value)}
+                onChange={(e) => setSendUsd(cleanNumericInput(e.target.value))}
                 required
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono font-bold text-slate-900"
               />
@@ -194,10 +200,12 @@ export function EditTransactionModal({ transaction, onClose }: EditTransactionMo
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Dollar Rate (BDT)</label>
               <input
-                type="number"
-                step="any"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*[.]?[0-9]*"
+                autoComplete="off"
                 value={dollarRate}
-                onChange={(e) => setDollarRate(e.target.value)}
+                onChange={(e) => setDollarRate(cleanNumericInput(e.target.value))}
                 required
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono font-bold text-slate-900"
               />
@@ -206,10 +214,12 @@ export function EditTransactionModal({ transaction, onClose }: EditTransactionMo
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Actual Send (BDT)</label>
               <input
-                type="number"
-                step="any"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*[.]?[0-9]*"
+                autoComplete="off"
                 value={actualSend}
-                onChange={(e) => setActualSend(e.target.value)}
+                onChange={(e) => setActualSend(cleanNumericInput(e.target.value))}
                 required
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono font-bold text-slate-900"
               />

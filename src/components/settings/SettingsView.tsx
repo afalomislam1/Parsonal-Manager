@@ -20,6 +20,7 @@ import {
 import { useAccounting } from '../../context/AccountingContext';
 import { exportJSONBackup, importJSONBackup, exportTransactionsCSV } from '../../utils/storage';
 import { DEFAULT_BANKS, DEFAULT_REFERENCES } from '../../constants/banks';
+import { cleanNumericInput } from '../../utils/calculations';
 
 export function SettingsView() {
   const {
@@ -264,11 +265,12 @@ export function SettingsView() {
               <div className="relative max-w-xs">
                 <span className="absolute left-3 top-2 text-slate-400 font-bold">৳</span>
                 <input
-                  type="number"
-                  step="0.01"
-                  min="1"
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]*[.]?[0-9]*"
+                  autoComplete="off"
                   value={dollarRateSetting}
-                  onChange={(e) => setDollarRateSetting(e.target.value)}
+                  onChange={(e) => setDollarRateSetting(cleanNumericInput(e.target.value))}
                   className="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600"
                   placeholder="123.00"
                 />
@@ -308,11 +310,12 @@ export function SettingsView() {
               <div className="relative max-w-xs">
                 <span className="absolute left-3 top-2 text-slate-400 font-bold">৳</span>
                 <input
-                  type="number"
-                  step="0.05"
-                  min="0"
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]*[.]?[0-9]*"
+                  autoComplete="off"
                   value={commissionRate}
-                  onChange={(e) => setCommissionRate(e.target.value)}
+                  onChange={(e) => setCommissionRate(cleanNumericInput(e.target.value))}
                   className="w-full pl-8 pr-3 py-2 rounded-lg border border-slate-300 text-slate-900 text-sm font-mono font-bold"
                 />
               </div>
@@ -353,7 +356,7 @@ export function SettingsView() {
             />
             <button
               type="submit"
-              className="px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center space-x-1"
+              className="px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1 transition shadow-2xs"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add</span>
